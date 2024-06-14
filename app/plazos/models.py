@@ -26,7 +26,7 @@ class PlazoFijo(models.Model):
 
 class Entidad(models.Model):
     nombre = models.CharField(max_length=100)
-    monto = models.FloatField(null=False, blank=False)
+    monto = models.FloatField(null=False, blank=False, default=0)
     plazo_fijo = models.ForeignKey(PlazoFijo, on_delete=models.CASCADE)
 
     def __str__(self):
