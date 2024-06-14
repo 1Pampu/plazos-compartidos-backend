@@ -9,6 +9,7 @@ from .serializers import (
     OperacionReadSerializer, OperacionWriteSerializer,
     )
 from .models import PlazoFijo, Entidad, Operacion
+from django.utils import timezone
 
 # Create your views here.
 @api_view(['GET', 'POST', 'PATCH', 'DELETE'])
@@ -125,3 +126,24 @@ def OperacionView(request, id=None, id_entidad=None):
             return Response(serializer.data)
         else:
             return Response(serializer.errors)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def InteresesView(request, id=None):
+    if request.method == 'POST':
+        plazo = get_object_or_404(PlazoFijo, pk=id, user=request.user)
+        entidades = Entidad.objects.filter(plazo=plazo)
+        for entidad in entidades:
+            interes = (entidad.monto * plazo.interes) / 100
+            operacion = Operacion.objects.create(
+                tipo='Interes',
+                monto=interes,
+                fecha=timezone.now(),
+                entidad=entidad,
+                plazo=plazo
+            )
+            entidad.monto += interes
+            entidad.save()
+            plazo.monto += interes
+        plazo.save()
+        return Response({'detail': 'Interests calculated'})
