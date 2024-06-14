@@ -15,7 +15,7 @@ class PlazoFijo(models.Model):
 
     def calcular_monto(self):
         monto = 0
-        entidades = Entidad.objects.filter(plazo_fijo=self)
+        entidades = Entidad.objects.filter(plazo=self)
 
         if not entidades:
             return monto
@@ -27,14 +27,20 @@ class PlazoFijo(models.Model):
 class Entidad(models.Model):
     nombre = models.CharField(max_length=100)
     monto = models.FloatField(null=False, blank=False, default=0)
-    plazo_fijo = models.ForeignKey(PlazoFijo, on_delete=models.CASCADE)
+    plazo = models.ForeignKey(PlazoFijo, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.nombre
 
 class Operacion(models.Model):
-    tipo = models.Choices('Deposito', 'Retiro')
-    monto = models.FloatField(null=False, blank=False)
+    TIPO_CHOICES = [
+        ('Deposito', 'Depósito'),
+        ('Retiro', 'Retiro'),
+        ('Interes', 'Interés'),
+    ]
+
+    tipo = models.CharField(max_length=10, choices=TIPO_CHOICES)
+    monto = models.FloatField(null=False, blank=False, validators=[MinValueValidator(0)])
     fecha = models.DateField(null=False, blank=False)
     entidad = models.ForeignKey(Entidad, on_delete=models.CASCADE)
     plazo = models.ForeignKey(PlazoFijo, on_delete=models.CASCADE)
