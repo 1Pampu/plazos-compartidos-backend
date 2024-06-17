@@ -4,6 +4,10 @@ from .models import User
 
 # Create your serializers here.
 class LoginSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'password', 'username', 'tokens']
+
     email = serializers.EmailField(max_length=255, min_length=3)
     password = serializers.CharField(max_length=255, min_length=3, write_only=True)
     username = serializers.CharField(max_length=255, min_length=3, read_only=True)
@@ -17,9 +21,22 @@ class LoginSerializer(serializers.ModelSerializer):
             'refresh': user.tokens()['refresh'],
         }
 
-    class Meta:
-        model = User
-        fields = ['id', 'email', 'password', 'username', 'tokens']
+    def validate(self, attrs) -> dict:
+        email: str = attrs.get('email', '')
+        password: str = attrs.get('password', '')
+
+        user = authenticate(email=email, password=password)
+        if not user:
+            raise exceptions.AuthenticationFailed('Invalid credentials, try again')
+        if not user.is_active:
+            raise exceptions.AuthenticationFailed('Account disables, contact admin')
+
+        return {
+            'id': user.id,
+            'email': user.email,
+            'username': user.username,
+            'tokens': user.tokens()
+        }
 
 
 class RegisterSerializer(serializers.ModelSerializer):
