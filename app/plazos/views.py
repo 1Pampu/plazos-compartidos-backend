@@ -132,18 +132,5 @@ def OperacionView(request, id=None, id_entidad=None):
 def InteresesView(request, id=None):
     if request.method == 'POST':
         plazo = get_object_or_404(PlazoFijo, pk=id, user=request.user)
-        entidades = Entidad.objects.filter(plazo=plazo)
-        for entidad in entidades:
-            interes = (entidad.monto * plazo.interes) / 100
-            operacion = Operacion.objects.create(
-                tipo='Interes',
-                monto=interes,
-                fecha=timezone.now(),
-                entidad=entidad,
-                plazo=plazo
-            )
-            entidad.monto += interes
-            entidad.save()
-            plazo.monto += interes
-        plazo.save()
+        plazo.calcular_intereses()
         return Response({'detail': 'Interests calculated'})

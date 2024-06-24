@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     # Dependencies
     'rest_framework',
     'corsheaders',
+    'django_crontab',
 ]
 
 REST_FRAMEWORK = {
@@ -123,7 +124,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-es'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Argentina/Buenos_Aires'
 
 USE_I18N = True
 
@@ -145,4 +146,9 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5500",
     "http://127.0.0.1:8000",
     "https://1pampu.github.io"
+]
+
+# CRONTABS
+CRONJOBS = [
+    ('20 30 * * *', 'app.plazos.tasks.interes_diario'),
 ]

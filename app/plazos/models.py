@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils import timezone
 
 # Create your models here.
 class PlazoFijo(models.Model):
@@ -23,6 +24,22 @@ class PlazoFijo(models.Model):
         for entidad in entidades:
             monto += entidad.monto
         return monto
+
+    def calcular_intereses(self):
+        entidades = Entidad.objects.filter(plazo=self)
+        for entidad in entidades:
+            interes = (entidad.monto * self.interes) / 100
+            operacion = Operacion.objects.create(
+                tipo='Interes',
+                monto=interes,
+                fecha=timezone.now(),
+                entidad=entidad,
+                plazo=self
+                )
+            entidad.monto += interes
+            entidad.save()
+            self.monto += interes
+        self.save()
 
 class Entidad(models.Model):
     nombre = models.CharField(max_length=100)
