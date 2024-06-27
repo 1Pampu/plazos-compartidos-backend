@@ -2,7 +2,11 @@
 FROM python:3.10-slim
 
 # Instala librerias
-RUN apt-get install libmysqlclient-dev
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libmysqlclient-dev \
+    pkg-config \
+ && rm -rf /var/lib/apt/lists/*
 
 # Establece el directorio de trabajo
 WORKDIR /app
