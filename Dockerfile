@@ -1,12 +1,8 @@
 # Usa una imagen base oficial de Python 3.10
 FROM python:3.10-slim
 
-# Instala las herramientas necesarias (incluyendo pkg-config)
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libmysqlclient-dev \
-    pkg-config \
- && rm -rf /var/lib/apt/lists/*
+# Instala librerias
+RUN apt-get install libmysqlclient-dev
 
 # Establece el directorio de trabajo
 WORKDIR /app
