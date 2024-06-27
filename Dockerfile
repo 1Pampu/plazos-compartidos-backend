@@ -4,7 +4,7 @@ FROM python:3.10-slim
 # Instala librerias
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
-    libmysqlclient-dev \
+    libmariadb-dev-compat \
     pkg-config \
  && rm -rf /var/lib/apt/lists/*
 
