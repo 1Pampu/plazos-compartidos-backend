@@ -39,5 +39,5 @@ jobs:
           docker pull ${{ secrets.DOCKER_USERNAME }}/plazos-compartidos-api:latest
           docker stop plazos-compartidos-api || true
           docker rm plazos-compartidos-api || true
-          docker run -d --restart unless-stopped --name plazos-compartidos-api --env SECRET_KEY=${{ secrets.SECRET_KEY }} --env DB_HOST=MySQL --env DB_NAME=${{ secrets.DB_NAME }} --env DB_USER=${{ secrets.DB_USER }} --env DB_PASSWORD=${{ secrets.DB_PASSWORD }} --env DB_PORT=${{ secrets.DB_PORT }} --publish 8888:8888 1pampu/plazos-compartidos-api:latest
+          docker run -d --restart unless-stopped --name plazos-compartidos-api --publish 8888:8888 1pampu/plazos-compartidos-api:latest
         EOF
