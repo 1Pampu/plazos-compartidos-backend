@@ -16,19 +16,12 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
-# Define el argumento de build para SSL_PATH
-ARG SSL_PATH
-
-# Asegura que SSL_PATH esté definido o establece un valor por defecto
-ENV SSL_PATH=${SSL_PATH:-}
-
-# Verifica que SSL_PATH esté definido y no esté vacío antes de copiar los archivos
-RUN if [ -n "$SSL_PATH" ]; then mkdir -p /app/certs && \
-    cp ${SSL_PATH}/fullchain.pem /app/certs/ && \
-    cp ${SSL_PATH}/privkey.pem /app/certs/; fi
+# Copia el script de inicio
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
 
 # Expone el puerto en el que Gunicorn correrá
 EXPOSE 8888
 
-# Corre Gunicorn para servir la aplicación Django
-CMD ["gunicorn", "--certfile", "certs/fullchain.pem", "--keyfile", "certs/privkey.pem", "--bind", "0.0.0.0:8888", "config.wsgi:application"]
+# Corre el script de inicio
+CMD ["/app/start.sh"]
