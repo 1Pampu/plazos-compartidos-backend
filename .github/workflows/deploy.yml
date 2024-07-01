@@ -48,15 +48,6 @@ jobs:
             --env DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
             --env DB_PORT=${{ secrets.DB_PORT }} \
             --network "mysql -red" \
-            --network "traefik-net" \
-            --publish 8888:8888 \
-            --label "traefik.enable=true" \
-            --label "traefik.http.routers.plazos-compartidos.rule=PathPrefix(`/plazos-compartidos`)" \
-            --label "traefik.http.routers.plazos-compartidos.entrypoints=web" \
-            --label "traefik.http.services.plazos-compartidos.loadbalancer.server.port=8888" \
-            --label "traefik.http.routers.plazos-compartidos-secure.rule=PathPrefix(`/plazos-compartidos`)" \
-            --label "traefik.http.routers.plazos-compartidos-secure.entrypoints=websecure" \
-            --label "traefik.http.routers.plazos-compartidos-secure.tls=true" \
-            --label "traefik.http.routers.plazos-compartidos-secure.tls.certresolver=myresolver" \
+            -v "${{ secrets.SSL_PATH }}":"/SSL" \
             1pampu/plazos-compartidos-api:latest
-          EOF
+        EOF

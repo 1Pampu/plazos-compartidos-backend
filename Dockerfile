@@ -20,4 +20,4 @@ COPY . .
 EXPOSE 8888
 
 # Corre Gunicorn para servir la aplicación Django
-CMD ["gunicorn", "--bind", "0.0.0.0:8888", "config.wsgi:application"]
+CMD ["gunicorn", "--certfile", "SSL/fullchain.pem", "--keyfile", 'SSL/privkey.pem', "--bind", "0.0.0.0:8888", "config.wsgi:application"]
