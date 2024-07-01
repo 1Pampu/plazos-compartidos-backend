@@ -16,8 +16,13 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
+# Copia los archivos SSL al contenedor usando una variable de entorno
+ARG SSL_PATH
+COPY ${SSL_PATH}/fullchain.pem /app/certs/
+COPY ${SSL_PATH}/privkey.pem /app/certs/
+
 # Expone el puerto en el que Gunicorn correrá
 EXPOSE 8888
 
 # Corre Gunicorn para servir la aplicación Django
-CMD ["gunicorn", "--certfile", "SSL/fullchain.pem", "--keyfile", "SSL/privkey.pem", "--bind", "0.0.0.0:8888", "config.wsgi:application"]
+CMD ["gunicorn", "--certfile", "certs/fullchain.pem", "--keyfile", "certs/privkey.pem", "--bind", "0.0.0.0:8888", "config.wsgi:application"]
