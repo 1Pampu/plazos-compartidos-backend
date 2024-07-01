@@ -49,5 +49,6 @@ jobs:
             --env DB_PORT=${{ secrets.DB_PORT }} \
             --env SSL_PATH="${{ secrets.SSL_PATH }}" \
             --network "mysql -red" \
+            -v "${{ secrets.SSL_PATH }}":"/app/bind" \
             1pampu/plazos-compartidos-api:latest
         EOF
