@@ -47,8 +47,8 @@ jobs:
             --env DB_USER=${{ secrets.DB_USER }} \
             --env DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
             --env DB_PORT=${{ secrets.DB_PORT }} \
-            --env SSL_PATH="${{ secrets.SSL_PATH }}" \
             --network "mysql -red" \
-            -v "${{ secrets.SSL_PATH }}":"/app/bind" \
+            -v SSL_Certificados:"/app/certs" \
+            -p 8888:8888 \
             1pampu/plazos-compartidos-api:latest
         EOF

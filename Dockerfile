@@ -16,12 +16,8 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
-# Copia el script de inicio
-COPY start.sh /app/start.sh
-RUN chmod +x /app/start.sh
-
 # Expone el puerto en el que Gunicorn correrá
 EXPOSE 8888
 
 # Corre el script de inicio
-CMD ["/app/start.sh"]
+CMD ['gunicorn', '--certfile', 'certs/fullchain.pem', '--keyfile', 'certs/privkey.pem', '--bind', '0.0.0.0:8888', 'config.wsgi:application']
