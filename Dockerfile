@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libmariadb-dev-compat \
     pkg-config \
+    cron \
  && rm -rf /var/lib/apt/lists/*
 
 # Establece el directorio de trabajo
