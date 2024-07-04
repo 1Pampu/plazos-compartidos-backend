@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Iniciar el servicio cron
+service cron start
+
 # Agregar el cronjob
 python manage.py crontab add
 
