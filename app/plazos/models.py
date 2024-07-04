@@ -61,6 +61,7 @@ class Operacion(models.Model):
     fecha = models.DateField(null=False, blank=False)
     entidad = models.ForeignKey(Entidad, on_delete=models.CASCADE)
     plazo = models.ForeignKey(PlazoFijo, on_delete=models.CASCADE)
+    nuevo_monto = models.FloatField(null=False, blank=False)
 
     def __str__(self):
         return self.monto

@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.utils import timezone
 from .models import PlazoFijo, Entidad, Operacion
 
 # Create your serializers here.
@@ -35,10 +36,15 @@ class OperacionReadSerializer(serializers.ModelSerializer):
 class OperacionWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Operacion
-        exclude = ['plazo', 'entidad']
+        exclude = ['plazo', 'entidad', 'nuevo_monto']
 
     def validate_tipo(self, value):
         restricted_choices = ['Interes']
         if value in restricted_choices:
             raise serializers.ValidationError(f'{value} is not a valid choice')
+        return value
+
+    def validate_fecha(self, value):
+        if value > timezone.now().date():
+            raise serializers.ValidationError('The date cannot be in the future')
         return value
