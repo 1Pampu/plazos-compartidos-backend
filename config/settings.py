@@ -149,5 +149,5 @@ CORS_ALLOWED_ORIGINS = [
 
 # CRONTABS
 CRONJOBS = [
-    ('55 19 * * *', 'app.plazos.tasks.interes_diario'),
+    ('30 20 * * *', 'app.plazos.tasks.interes_diario'),
 ]
