@@ -1,0 +1,1 @@
+20 20 * * * python manage.py interes_diario

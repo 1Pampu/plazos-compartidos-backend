@@ -151,5 +151,3 @@ CORS_ALLOWED_ORIGINS = [
 CRONJOBS = [
     ('55 19 * * *', 'app.plazos.tasks.interes_diario'),
 ]
-
-CRONTAB_EXECUTABLE = '/usr/local/bin/supercronic'
