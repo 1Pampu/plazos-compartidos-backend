@@ -28,15 +28,9 @@ WORKDIR /app
 
 # Copia el archivo de requisitos y el código del proyecto
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-COPY . .
+RUN pip install -r requirements.txt
 
-# Copia el script de inicio
-COPY start.sh /app/start.sh
-RUN chmod +x /app/start.sh
-
-# Expone el puerto en el que Gunicorn correrá
-EXPOSE 8888
+COPY cron.txt .
 
 # Corre el script de inicio
-CMD ["/app/start.sh"]
+CMD ["supercronic", "cron.txt"]
