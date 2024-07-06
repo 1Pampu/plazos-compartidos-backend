@@ -64,7 +64,7 @@ jobs:
             --env DB_PORT=${{ secrets.DB_PORT }} \
             --env TZ="America/Argentina/Buenos_Aires" \
             --network "mysql -red" \
-            -v plazos-compartidos-data:"/app"
+            -v plazos-compartidos-data:"/app" \
             -v SSL_Certificados:"/app/certs" \
             -p 8888:8888 \
             1pampu/plazos-compartidos-api:latest
