@@ -54,10 +54,6 @@ jobs:
           docker rm plazos-compartidos-cron || true
           docker rm plazos-compartidos-api || true
 
-          if docker volume ls -q -f name=plazos-compartidos-data | grep -q '^plazos-compartidos-data$'; then
-            docker volume rm plazos-compartidos-data
-          fi
-
           docker run -d --restart unless-stopped \
             --name plazos-compartidos-cron \
             --env SECRET_KEY=${{ secrets.SECRET_KEY }} \
@@ -68,7 +64,6 @@ jobs:
             --env DB_PORT=${{ secrets.DB_PORT }} \
             --env TZ="America/Argentina/Buenos_Aires" \
             --network "mysql -red" \
-            -v plazos-compartidos-data:"/app" \
             1pampu/plazos-compartidos-cron:latest
 
           docker run -d --restart unless-stopped \
@@ -81,7 +76,6 @@ jobs:
             --env DB_PORT=${{ secrets.DB_PORT }} \
             --env TZ="America/Argentina/Buenos_Aires" \
             --network "mysql -red" \
-            -v plazos-compartidos-data:"/app" \
             -v SSL_Certificados:"/app/certs" \
             -p 8888:8888 \
             1pampu/plazos-compartidos-api:latest
