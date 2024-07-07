@@ -28,17 +28,18 @@ class PlazoFijo(models.Model):
     def calcular_intereses(self):
         entidades = Entidad.objects.filter(plazo=self)
         for entidad in entidades:
-            interes = (entidad.monto * self.interes) / 100
-            operacion = Operacion.objects.create(
-                tipo='Interes',
-                monto=interes,
-                fecha=timezone.now(),
-                entidad=entidad,
-                plazo=self
-                )
-            entidad.monto += interes
-            entidad.save()
-            self.monto += interes
+            if entidad.monto > 0:
+                interes = (entidad.monto * self.interes) / 100
+                operacion = Operacion.objects.create(
+                    tipo='Interes',
+                    monto=interes,
+                    fecha=timezone.now(),
+                    entidad=entidad,
+                    plazo=self
+                    )
+                entidad.monto += interes
+                entidad.save()
+                self.monto += interes
         self.save()
 
 class Entidad(models.Model):
