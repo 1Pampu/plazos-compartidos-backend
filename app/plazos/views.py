@@ -10,6 +10,7 @@ from .serializers import (
     )
 from .models import PlazoFijo, Entidad, Operacion
 from django.utils import timezone
+from datetime import timedelta
 
 # Create your views here.
 @api_view(['GET', 'POST', 'PATCH', 'DELETE'])
@@ -109,24 +110,40 @@ def OperacionView(request, id=None, id_entidad=None):
         entidad = get_object_or_404(Entidad, pk=id_entidad, plazo=plazo)
         serializer = OperacionWriteSerializer(data=request.data)
         if serializer.is_valid():
-            validated_data = serializer.validated_data
-            tipo = validated_data.get('tipo')
-            monto = validated_data.get('monto')
-            if tipo == 'Deposito':
-                entidad.monto += monto
-                plazo.monto += monto
-            elif tipo == 'Retiro':
-                if entidad.monto < monto:
-                    return Response({'detail': 'Not enough money'}, status=status.HTTP_400_BAD_REQUEST)
-                entidad.monto -= monto
-                plazo.monto -= monto
-            serializer.save(entidad=entidad, plazo=plazo)
-            entidad.save()
-            plazo.save()
-            return Response(serializer.data)
+            # * SI LA FECHA INGRESADA ES HOY
+            if serializer.validated_data.get('fecha') == timezone.now().date():
+                validated_data = serializer.validated_data
+                tipo = validated_data.get('tipo')
+                monto = validated_data.get('monto')
+                if tipo == 'Deposito':
+                    entidad.monto += monto
+                    plazo.monto += monto
+                elif tipo == 'Retiro':
+                    if entidad.monto < monto:
+                        return Response({'detail': 'Not enough money'}, status=status.HTTP_400_BAD_REQUEST)
+                    entidad.monto -= monto
+                    plazo.monto -= monto
+                serializer.save(entidad=entidad, plazo=plazo, nuevo_monto=entidad.monto)
+                entidad.save()
+                plazo.save()
+                return Response(serializer.data)
+            elif serializer.validated_data.get('fecha') < timezone.now().date():
+                # Obtener los dias a iterar
+                fecha_operacion = serializer.validated_data.get('fecha')
+                fecha_hoy = timezone.now().date()
+                fechas = []
+                fecha_inicial = fecha_operacion
+                while fecha_inicial <= fecha_hoy:
+                    fechas.append(fecha_inicial)
+                    fecha_inicial += timedelta(days=1)
+
+                # Obtener Operaciones
+                operaciones = Operacion.objects.filter(entidad=entidad, fecha__gte=fecha_operacion)
+                pass
         else:
             return Response(serializer.errors)
 
+# ! ELIMINAR PROXIMAMENTE
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def InteresesView(request, id=None):
