@@ -57,7 +57,7 @@ jobs:
           docker run -d --restart unless-stopped \
             --name plazos-compartidos-cron \
             --env SECRET_KEY=${{ secrets.SECRET_KEY }} \
-            --env DB_HOST=${{ secrets.DB_HOST }} \
+            --env DB_HOST=MySQL \
             --env DB_NAME=${{ secrets.DB_NAME }} \
             --env DB_USER=${{ secrets.DB_USER }} \
             --env DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
