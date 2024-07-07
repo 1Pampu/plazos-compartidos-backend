@@ -1,1 +1,1 @@
-0 1 * * * python manage.py interes_diario
+0 0 * * * python manage.py interes_diario
