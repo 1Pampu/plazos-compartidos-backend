@@ -11,6 +11,7 @@ from .serializers import (
 from .models import PlazoFijo, Entidad, Operacion
 from django.utils import timezone
 from datetime import timedelta
+from .utils import generar_lista_fechas
 
 # Create your views here.
 @api_view(['GET', 'POST', 'PATCH', 'DELETE'])
@@ -110,36 +111,47 @@ def OperacionView(request, id=None, id_entidad=None):
         entidad = get_object_or_404(Entidad, pk=id_entidad, plazo=plazo)
         serializer = OperacionWriteSerializer(data=request.data)
         if serializer.is_valid():
-            # * SI LA FECHA INGRESADA ES HOY
-            if serializer.validated_data.get('fecha') == timezone.now().date():
-                validated_data = serializer.validated_data
-                tipo = validated_data.get('tipo')
-                monto = validated_data.get('monto')
-                if tipo == 'Deposito':
-                    entidad.monto += monto
-                    plazo.monto += monto
-                elif tipo == 'Retiro':
-                    if entidad.monto < monto:
-                        return Response({'detail': 'Not enough money'}, status=status.HTTP_400_BAD_REQUEST)
-                    entidad.monto -= monto
-                    plazo.monto -= monto
-                serializer.save(entidad=entidad, plazo=plazo, nuevo_monto=entidad.monto)
-                entidad.save()
-                plazo.save()
-                return Response(serializer.data)
-            elif serializer.validated_data.get('fecha') < timezone.now().date():
-                # Obtener los dias a iterar
-                fecha_operacion = serializer.validated_data.get('fecha')
-                fecha_hoy = timezone.now().date()
-                fechas = []
-                fecha_inicial = fecha_operacion
-                while fecha_inicial <= fecha_hoy:
-                    fechas.append(fecha_inicial)
-                    fecha_inicial += timedelta(days=1)
+            # Evitar que se registren operaciones antes de las existentes
+            fecha = serializer.validated_data.get('fecha')
+            operaciones_existentes = Operacion.objects.filter(entidad=entidad, fecha__gt=fecha, tipo__in=['Deposito', 'Retiro'])
+            if operaciones_existentes.exists():
+                return Response({'detail': 'An operation cannot be recorded before existing operations.'}, status=status.HTTP_400_BAD_REQUEST)
 
-                # Obtener Operaciones
-                operaciones = Operacion.objects.filter(entidad=entidad, fecha__gte=fecha_operacion)
-                pass
+            # Obtener el monto actual de la entidad
+            ultima_operacion = Operacion.objects.filter(entidad=entidad, fecha=fecha)
+            if ultima_operacion.exists():
+                monto = ultima_operacion.last().nuevo_monto
+            else:
+                monto = 0
+
+            # Verificar actualizaciones de monto
+            tipo = serializer.validated_data.get('tipo')
+            if tipo == 'Retiro':
+                if monto < serializer.validated_data.get('monto'):
+                    return Response({'detail': 'Not enough money'}, status=status.HTTP_400_BAD_REQUEST)
+                monto -= serializer.validated_data.get('monto')
+            else:
+                monto += serializer.validated_data.get('monto')
+
+
+            # Eliminar los intereses viejos y crear la operacion
+            intereses_viejos = Operacion.objects.filter(entidad=entidad, tipo='Interes', fecha__gt=fecha).delete()
+            serializer.save(entidad=entidad, plazo=plazo, nuevo_monto=monto)
+
+            # Generar los intereses nuevos
+            entidad.monto = monto
+            lista_fechas = generar_lista_fechas(fecha)
+            for fecha in lista_fechas:
+                entidad.generar_interes(fecha)
+            entidad.save()
+
+            # Actualizar el monto del plazo
+            plazo.monto = plazo.calcular_monto()
+            plazo.save()
+
+            # Retornar la operacion
+            return Response(serializer.data)
+
         else:
             return Response(serializer.errors)
 

@@ -47,6 +47,19 @@ class Entidad(models.Model):
     monto = models.FloatField(null=False, blank=False, default=0)
     plazo = models.ForeignKey(PlazoFijo, on_delete=models.CASCADE)
 
+    def generar_interes(self, fecha):
+        interes = (self.monto * self.plazo.interes) / 100
+        operacion = Operacion.objects.create(
+            tipo='Interes',
+            monto=interes,
+            fecha=fecha,
+            entidad=self,
+            plazo=self.plazo,
+            nuevo_monto=self.monto + interes
+            )
+        self.monto += interes
+        return True
+
     def __str__(self):
         return self.nombre
 
