@@ -152,12 +152,3 @@ def OperacionView(request, id=None, id_entidad=None):
 
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-# ! ELIMINAR PROXIMAMENTE
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def InteresesView(request, id=None):
-    if request.method == 'POST':
-        plazo = get_object_or_404(PlazoFijo, pk=id, user=request.user)
-        plazo.calcular_intereses()
-        return Response({'detail': 'Interests calculated'})
