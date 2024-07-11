@@ -9,8 +9,6 @@ from .serializers import (
     OperacionReadSerializer, OperacionWriteSerializer,
     )
 from .models import PlazoFijo, Entidad, Operacion
-from django.utils import timezone
-from datetime import timedelta
 from .utils import generar_lista_fechas
 
 # Create your views here.
@@ -33,7 +31,7 @@ def PlazoFijoView(request, id=None):
             serializer.save(user=request.user)
             return Response(serializer.data)
         else:
-            return Response(serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     if request.method == 'PATCH':
         plazo = get_object_or_404(PlazoFijo, pk=id, user=request.user)
@@ -42,7 +40,7 @@ def PlazoFijoView(request, id=None):
             serializer.save()
             return Response(serializer.data)
         else:
-            return Response(serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     if request.method == 'DELETE':
         plazo = get_object_or_404(PlazoFijo, pk=id, user=request.user)
@@ -67,7 +65,7 @@ def EntidadView(request, id=None, id_entidad=None):
             plazo.save()
             return Response(serializer.data)
         else:
-            return Response(serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     if request.method == 'PATCH':
         plazo = get_object_or_404(PlazoFijo, pk=id, user=request.user)
@@ -77,7 +75,7 @@ def EntidadView(request, id=None, id_entidad=None):
             serializer.save()
             return Response(serializer.data)
         else:
-            return Response(serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     if request.method == 'DELETE':
         plazo = get_object_or_404(PlazoFijo, pk=id, user=request.user)
@@ -153,13 +151,4 @@ def OperacionView(request, id=None, id_entidad=None):
             return Response(serializer.data)
 
         else:
-            return Response(serializer.errors)
-
-# ! ELIMINAR PROXIMAMENTE
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def InteresesView(request, id=None):
-    if request.method == 'POST':
-        plazo = get_object_or_404(PlazoFijo, pk=id, user=request.user)
-        plazo.calcular_intereses()
-        return Response({'detail': 'Interests calculated'})
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
