@@ -94,10 +94,10 @@ def OperacionView(request, id=None, id_entidad=None):
         plazo = get_object_or_404(PlazoFijo, pk=id, user=request.user)
         if id_entidad:
             entidad = get_object_or_404(Entidad, pk=id_entidad, plazo=plazo)
-            operaciones = Operacion.objects.filter(entidad=entidad)
+            operaciones = Operacion.objects.filter(entidad=entidad).order_by('-fecha','-id')
             serializer = OperacionReadSerializer(operaciones, many=True)
             return Response(serializer.data)
-        operaciones = Operacion.objects.filter(plazo=plazo)
+        operaciones = Operacion.objects.filter(plazo=plazo).order_by('-fecha','-id')
         serializer = OperacionReadSerializer(operaciones, many=True)
         return Response(serializer.data)
 
