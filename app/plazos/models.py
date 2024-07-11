@@ -35,7 +35,8 @@ class PlazoFijo(models.Model):
                     monto=interes,
                     fecha=timezone.now(),
                     entidad=entidad,
-                    plazo=self
+                    plazo=self,
+                    nuevo_monto=entidad.monto + interes
                     )
                 entidad.monto += interes
                 entidad.save()
