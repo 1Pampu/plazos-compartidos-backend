@@ -33,7 +33,7 @@ class PlazoFijo(models.Model):
                 operacion = Operacion.objects.create(
                     tipo='Interes',
                     monto=interes,
-                    fecha=timezone.now(),
+                    fecha=timezone.now().date(),
                     entidad=entidad,
                     plazo=self,
                     nuevo_monto=entidad.monto + interes
