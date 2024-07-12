@@ -45,6 +45,6 @@ class OperacionWriteSerializer(serializers.ModelSerializer):
         return value
 
     def validate_fecha(self, value):
-        if value > timezone.now().date():
+        if value > timezone.localtime(timezone.now()).date():
             raise serializers.ValidationError('The date cannot be in the future')
         return value

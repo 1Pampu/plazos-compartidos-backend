@@ -6,4 +6,5 @@ import random
 @api_view(['GET'])
 def RandomNumberView(request):
     random_number = random.randint(1, 100)
-    return Response({'random_number': random_number, 'date': timezone.now().date(), 'time': timezone.now().time()})
+    now = timezone.localtime(timezone.now())
+    return Response({'random_number': random_number, 'date': now.date(), 'time': now.time()})
